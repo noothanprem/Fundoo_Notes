@@ -1,0 +1,28 @@
+<html>
+<head>
+</head>
+    <title>Email verification</title>
+</head>
+<body>
+
+<div class="email-background" style="background: #66B2FF;padding: 10px;margin: auto;border-radius: 5px;">
+
+
+    <div class="email-container" style="max-width: 400px;background: #FFB266;font-family: sans-serif;margin: 0 auto;overflow: hidden;border-radius: 5px;text-align:center;">
+
+
+
+        <p style="margin: 20px;font-size: 16px;font-weight: 300;text-align: center;color: black;line-height: 1.5;">Please Verify Your email</p>
+
+        <div class="cta" style="margin:20px;">
+            <a href="http://{{ domain }}{%  url 'activate' token=token %}" style="text-decoration: None;display: inline-block;background: #003300;color:black;padding: 10px 20px;border-radius: 5px;">click the link</a>
+        </div>
+
+        <div class="footer" style="color:red">
+            From fundoo
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

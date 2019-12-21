@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE : fundoo_db
+      MYSQL_USER : noothan
+      MYSQL_PASSWORD : noothan
+      MYSQL_ROOT_PASSWORD : noothan
+  web:
+    env_file:
+      .env
+    build:
+      context: .
+      dockerfile: /home/admin1/PycharmProjects/FundooNotes/Dockerfile
+    command: bash -c "sleep 10 && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db

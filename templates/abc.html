@@ -1,0 +1,84 @@
+ <!--
+{% autoescape off %}
+Hi {{ user }}
+please click the link to confirm your registration,
+http://{{ domain }}{%  url 'activate' token=token %}
+{% endautoescape %}-->
+
+ <html>
+<head>
+</head>
+    <title>Email verification</title>
+</head>
+<body>
+
+<div class="email-background" style="background: #66B2FF;padding: 10px;margin: auto;border-radius: 5px;">
+
+
+    <div class="email-container" style="max-width: 500px;background: #FFB266;font-family: sans-serif;margin: 0 auto;overflow: hidden;border-radius: 5px;text-align:center;">
+
+
+
+        <p style="margin: 20px;font-size: 16px;font-weight: 300;text-align: center;color: black;line-height: 1.5;">Please Verify Your email</p>
+
+        <div class="cta" style="margin:20px;">
+            <a href="http://localhost:8000/accounts/activate" style="text-decoration: None;display: inline-block;background: #003300;color:black;padding: 10px 20px;border-radius: 5px;">click the link</a>
+        </div>
+
+        <div class="footer" style="color:red">
+            From fundoo
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+ {% if is_paginated %}
+    {% if page_obj.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and  num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+     {% if page_obj.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
+
+
+
+
+ {% if notes.has_other_pages %}
+    <ul class="pagination">
+      {% if notes.has_previous %}
+      <li><a class="btn btn-outline-info mb-4" href="?page=1">First</a></li>
+        <li><a href="?page={{ notes.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+      {% endif %}
+      {% for i in paginator.page_range %}
+        {% if notes.number == i %}
+          <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+          <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if notes.has_next %}
+        <li><a href="?page={{ notes.next_page_number }}">&raquo;</a></li>
+      {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+      {% endif %}
+    </ul>
+  {% endif %}
