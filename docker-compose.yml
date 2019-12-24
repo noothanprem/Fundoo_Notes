@@ -6,13 +6,16 @@ services:
     ports:
       - '3306:3306'
     environment:
-      MYSQL_DATABASE : fundoo_db
-      MYSQL_USER : noothan
+      MYSQL_DATABASE : fundoo
+      MYSQL_USER : fundoo_user
       MYSQL_PASSWORD : noothan
       MYSQL_ROOT_PASSWORD : noothan
+#    volumes:
+#      - /var/lib/mysql:/var/lib/mysql
+
   web:
-    env_file:
-      .env
+#    env_file:
+#      .env
     build:
       context: .
       dockerfile: /home/admin1/PycharmProjects/FundooNotes/Dockerfile
@@ -21,3 +24,5 @@ services:
       - '8000:8000'
     depends_on:
       - db
+    volumes:
+      - .:/var/applications
