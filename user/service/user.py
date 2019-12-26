@@ -127,12 +127,14 @@ class UserOperations:
             #pdb.set_trace()
             username = request.data['username']
             password = request.data['password']
-
+            print("user name :........ ",username)
+            print("Password ....... :",password)
             if username == "" or password == '':
                 response = response_class_object.smd_response(False, 'Username or Password is empty', '')
                 return response
 
             user = auth.authenticate(username=username, password=password)
+            print("user : ............",user)
 
 
             if user is not None:
@@ -150,6 +152,7 @@ class UserOperations:
 
                 user=request.user
                 user_id=user.id
+                print("token...............:",token)
                 #redis_object.set("loginuser",user_id)
                 redis_object.set(token,user_id)
 
@@ -243,7 +246,6 @@ class UserOperations:
             user_details = jwt.decode(token, "secret")
             user_name = user_details['username']
             userobject = User.objects.get(username=user_name)
-
             if userobject is not None:
                 password = request.data['password']
             else:

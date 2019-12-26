@@ -29,7 +29,7 @@ from .serializers import UploadImageSerializer, NoteShareSerializer, NoteSeriali
 from .service.label import LabelOperations
 from .service.note import NoteOperations
 from utility import Response
-from .background_tasks import hello
+# from .background_tasks import hello
 
 redisobject = RedisOperation()
 
@@ -402,15 +402,15 @@ class NotesSearch(GenericAPIView):
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
 
-class BackgroundTasks(GenericAPIView):
-    serializer_class = NoteSerializer
-
-
-    def get(self,request):
-        hello()
-        response = response_class_object.smd_response(True, "Successfully fetched notes", '')
-        final_response = response_class_object.json_response(response)
-        return HttpResponse(final_response)
+# class BackgroundTasks(GenericAPIView):
+#     serializer_class = NoteSerializer
+#
+#
+#     def get(self,request):
+#         hello()
+#         response = response_class_object.smd_response(True, "Successfully fetched notes", '')
+#         final_response = response_class_object.json_response(response)
+#         return HttpResponse(final_response)
 
 
 

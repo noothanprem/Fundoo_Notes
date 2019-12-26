@@ -7,5 +7,6 @@ WORKDIR /fundoo
 ADD . /fundoo/
 RUN apt-get update
 RUN apt-get install build-essential libssl-dev libffi-dev python3-dev -y
+RUN pip install mysqlclient
 RUN pip install -r requirements.txt
 CMD ["python", "./manage.py runserver 0.0.0.0:8000"]

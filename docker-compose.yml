@@ -12,6 +12,11 @@ services:
       MYSQL_ROOT_PASSWORD : noothan
 #    volumes:
 #      - /var/lib/mysql:/var/lib/mysql
+  redis:
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
   web:
 #    env_file:
@@ -19,10 +24,9 @@ services:
     build:
       context: .
       dockerfile: /home/admin1/PycharmProjects/FundooNotes/Dockerfile
-    command: bash -c "sleep 10 && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "sleep 60 && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
       - '8000:8000'
     depends_on:
       - db
-    volumes:
-      - .:/var/applications
+      - redis
