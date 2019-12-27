@@ -23,7 +23,7 @@ class LabelOperations:
     redisobject.__connect__()
 
 
-    def create_label(self, request):
+    def create_label(self, user,data):
         """
 
         :param request: to create label
@@ -31,13 +31,11 @@ class LabelOperations:
         """
 
         try:
-            name = request.data['name']
-
-            user = request.user
+            name = data['name']
             user_id = user.id
 
             #getting the user with the given id
-            userobject = User.objects.get(id=user.id)
+            userobject = User.objects.get(id=user_id)
 
             if Label.objects.filter(user_id=user_id, name=name).exists():
 
@@ -58,7 +56,7 @@ class LabelOperations:
         return response
 
 
-    def get_label(self, request):
+    def get_label(self, user):
         """
 
         :param request:get the labels of the user
@@ -67,17 +65,15 @@ class LabelOperations:
 
         global label_name
         try:
-
-            user = request.user
-            string_userid = str(user.id)
-            userlabels = redisobject.hvals(string_userid + "label")
+            user_id = user.id
+            string_user_id = str(user_id)
+            userlabels = redisobject.hvals(string_user_id + "label")
             userlabelsstring = str(userlabels)
-            print(userlabels, "from redisssss")
 
             if userlabels is None:
-                labels = Label.objects.filter(user_id=user.id)
+                labels = Label.objects.filter(user_id=user_id)
                 userlabelsstring = [i.name for i in labels]
-                logger.info("labels where fetched from database for user :%s", request.user)
+                logger.info("labels where fetched from database for user :%s", user)
             logger.info("labels where fetched from redis")
             response = response_class_object.smd_response(True, "Read Operation Successfull", userlabelsstring)
         except Label.DoesNotExist:
@@ -85,7 +81,7 @@ class LabelOperations:
             response = response_class_object.smd_response(False, "Exception occured while getting the Label", '')
         return response
 
-    def update_label(self, request, label_id):
+    def update_label(self, user,request_body, label_id):
         """
 
         :param request:to update the particular label
@@ -95,9 +91,6 @@ class LabelOperations:
 
         try:
 
-
-            user = request.user
-            request_body = request.body
             body_unicode = request_body.decode('utf-8')
             body_unicode_dict = json.loads(body_unicode)
             user_id = user.id
@@ -124,7 +117,7 @@ class LabelOperations:
 
         return response
 
-    def delete_label(self, request, label_id):
+    def delete_label(self, user, label_id):
         """
 
         :param request: to delete the particular label
@@ -134,8 +127,6 @@ class LabelOperations:
 
         try:
             # pdb.set_trace()
-
-            user = request.user
             user_id = user.id
 
             label_object = Label.objects.get(id=label_id, user_id=user_id)

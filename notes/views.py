@@ -98,18 +98,16 @@ class Trash(GenericAPIView):
         :return: returns the notes in the trash
         """
 
-        try:
-            user = request.user
-            user_id = user.id
-            noteobject = Note.objects.filter(user_id=user_id, is_trash=True)
-            notevalues_str = str(noteobject.values())
-        except Note.DoesNotExist:
-            response = response_class_object.smd_response(False, "Exception occured while accessing note", '')
-            final_response = response_class_object.json_response(response)
-            return HttpResponse(final_response, status=400)
-        response = response_class_object.smd_response(True, "Trash Get operation successful",notevalues_str)
+        user = request.user
+        user_id = user.id
+        response = noteobject.get_trash(user)
+
+
         final_response = response_class_object.json_response(response)
-        return HttpResponse(final_response)
+        if response['success'] == True:
+            return HttpResponse(final_response)
+        else:
+            return HttpResponse(final_response,status = 400)
 
 
 @method_decorator(login_decorator, name='dispatch')
@@ -120,23 +118,14 @@ class Archieve(GenericAPIView):
         :param request: requests for the archieved note
         :return: returns the archieved notes
         """
-
-        try:
-            user = request.user
-            user_id = user.id
-            print(user_id)
-            noteobject = Note.objects.filter(user_id=user_id, is_archieve=True)
-            string_note = str(noteobject.values())
-
-        except Note.DoesNotExist:
-            self.response['message'] = "Exception occured while accessing note"
-            response = response_class_object.smd_response(False, "Exception occured while accessing note", '')
-            final_response = response_class_object.json_response(response)
-            return HttpResponse(final_response)
-
-        response = response_class_object.smd_response(False, "Trash Get operation successful", string_note)
+        user = request.user
+        response = noteobject.get_archieved_notes(user)
         final_response = response_class_object.json_response(response)
-        return HttpResponse(final_response)
+        if response['success'] == True:
+            return HttpResponse(final_response)
+        else:
+            return HttpResponse(final_response,status = 400)
+
 
 @method_decorator(login_decorator, name='dispatch')
 class Reminder(GenericAPIView):
@@ -148,34 +137,13 @@ class Reminder(GenericAPIView):
         :return: returns the reminders lists
         """
 
-        try:
-            user = request.user
-
-            user_id = user.id
-
-            noteobjects = Note.objects.filter(user_id=user_id)
-
-            remaining_list = []
-            completed_list = []
-            for noteobject in noteobjects:
-
-                if getattr(noteobject, 'reminder') > timezone.now():
-                    remaining_list.append(noteobject.reminder)
-                else:
-                    completed_list.append(noteobject.reminder)
-            reminders = {
-                "remaining": remaining_list,
-                "completed": completed_list
-            }
-            reminder_string = str(reminders)
-
-            response = response_class_object.smd_response(True, "Reminder operation successful", reminder_string)
-        except Note.DoesNotExist:
-            response = response_class_object.smd_response(False, "Exception occured while accessing the note", '')
-            final_response = response_class_object.json_response(response)
-            return HttpResponse(final_response)
+        user = request.user
+        response = noteobject.get_reminders(user)
         final_response = response_class_object.json_response(response)
-        return HttpResponse(final_response)
+        if response['success'] == True:
+            return HttpResponse(final_response)
+        else:
+            return HttpResponse(final_response,status=400)
 
 
 @method_decorator(login_decorator, name='dispatch')
@@ -188,7 +156,8 @@ class CreateLabel(GenericAPIView):
         :param request: requests for label
         :return: returns the label data
         """
-        response_from_get_label = labelobject.get_label(request)
+        user = request.user
+        response_from_get_label = labelobject.get_label(user)
         final_response = response_class_object.json_response(response_from_get_label)
         if response_from_get_label['success'] == False:
             return HttpResponse(final_response,status = 404)
@@ -200,8 +169,9 @@ class CreateLabel(GenericAPIView):
         :param request: requests to create a label
         :return: creates a label and returns the new label data
         """
-
-        response_from_create_label = labelobject.create_label(request)
+        user = request.user
+        data = request.data
+        response_from_create_label = labelobject.create_label(user,data)
         final_response = response_class_object.json_response(response_from_create_label)
         if not response_from_create_label['success']:
             return HttpResponse(final_response,status = 404)
@@ -221,7 +191,9 @@ class UpdateLabel(GenericAPIView):
         :param label_id: id of the label to update
         :return: updates the label and returns the new label data
         """
-        response = labelobject.update_label(request, label_id)
+        user = request.user
+        request_body = request.body
+        response = labelobject.update_label(user,request_body,label_id)
         final_response = response_class_object.json_response(response)
         if response['success'] == False:
             return HttpResponse(final_response, status=400)
@@ -235,7 +207,8 @@ class UpdateLabel(GenericAPIView):
         :param label_id: id of the label to delete
         :return: deletes the label
         """
-        response = labelobject.delete_label(request, label_id)
+        user = request.user
+        response = labelobject.delete_label(user, label_id)
         final_response = response_class_object.json_response(response)
         if response['success'] == False:
             return HttpResponse(final_response,status=404)
@@ -294,7 +267,8 @@ class UpdateNote(GenericAPIView):
         :param note_id: id of the note
         :return: returns the requested note datas
         """
-        response = noteobject.get_note(request, note_id)
+        user = request.user
+        response = noteobject.get_note(user, note_id)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
             return HttpResponse(final_response, status=400)
@@ -308,8 +282,9 @@ class UpdateNote(GenericAPIView):
         :param note_id: id of the note to update
         :return: updates the note and returns the updated data
         """
-
-        response = noteobject.update_note(request, note_id)
+        user =  request.user
+        request_data = request.data
+        response = noteobject.update_note(user,request_data, note_id)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
             return HttpResponse(final_response, status=400)
@@ -323,7 +298,8 @@ class UpdateNote(GenericAPIView):
         :param note_id: id of the note to delete
         :return: deletes the note
         """
-        response = noteobject.delete_note(request, note_id)
+        user = request.user
+        response = noteobject.delete_note(user, note_id)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
 
@@ -344,22 +320,8 @@ class ReminderNotification(GenericAPIView):
     serializer_class = NoteSerializer
 
     def get(self,request):
-        notes_set = Note.objects.filter(reminder__isnull=False)
-        print("notes set : ",notes_set)
-        reminder_list = []
-        initial_time  = timezone.localtime(timezone.now())
-        end_time = timezone.now() + timezone.timedelta(minutes = 1)
 
-        for i in range(len(notes_set)):
-            print(notes_set.values()[i]['reminder'])
-            if initial_time < notes_set.values()[i]['reminder'] < end_time:
-                subject = "Note Reminder"
-                message = render_to_string('note_reminder_email.html')
-                sender = os.getenv('EMAIL_HOST_USER')
-                reciever = os.getenv('EMAILID')
-
-                send_mail(subject, message, sender, [reciever])
-        response = response_class_object.smd_response(True,"Success",'')
+        response = noteobject.reminder_notification()
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
 

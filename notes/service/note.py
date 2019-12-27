@@ -1,3 +1,4 @@
+import os
 import pdb
 
 from django.contrib.auth.models import User
@@ -8,6 +9,10 @@ from notes.models import Note, Label
 from notes.lib.redis_function import RedisOperation
 from notes.serializers import NoteSerializer
 from fundoo.settings import file_handler
+from django.core.mail import send_mail
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.utils import timezone
 import json
 import logging
 
@@ -30,7 +35,7 @@ class NoteOperations:
     def smd_response(self, success, message, data):
         self.response['success']=success
         self.response['message']=message
-        self.response['data']=data
+        self.response['data'].append(data)
         return self.response
     """
     Function for creating note
@@ -120,7 +125,7 @@ class NoteOperations:
         return response
 
 
-    def get_note(self, request, note_id):
+    def get_note(self, user, note_id):
         """
         :param request: to get the note
         :param note_id: id of the note
@@ -130,7 +135,6 @@ class NoteOperations:
 
         try:
 
-            user = request.user
             string_user_id=str(user.id)
             redis_data=redisobject.hvals(string_user_id+"note")
             str_note_data=str(redis_data)
@@ -166,7 +170,7 @@ class NoteOperations:
 
 
 
-    def update_note(self, request, note_id):
+    def update_note(self, user,request_data, note_id):
         """
         :param request: to update a note
         :param note_id: id of the note
@@ -181,15 +185,13 @@ class NoteOperations:
 
                 #getting the data from request
 
-                request_data = request.data
-
 
                 #getting the user
 
-                user = request.user
 
 
-                user_id = request.user.id
+
+                user_id = user.id
 
             except Note.DoesNotExist:
                 logger.error("Exception occured while accessing Note")
@@ -278,15 +280,14 @@ class NoteOperations:
 
     #Function to delete the note
 
-    def delete_note(self, request, note_id):
+    def delete_note(self, user, note_id):
         """
         :param request: for deleting note
         :param note_id: id of the note
         :return: makes is_trash to True
         """
 
-        #pdb.set_trace()
-        user = request.user
+
         try:
 
             #getting the note with the given id
@@ -311,3 +312,81 @@ class NoteOperations:
             self.response['message'] = "Delete operation failed"
             return self.response
         return self.response
+
+    def reminder_notification(self):
+
+        notes_set = Note.objects.filter(reminder__isnull=False)
+        print("notes set : ", notes_set)
+        reminder_list = []
+        initial_time = timezone.localtime(timezone.now())
+        end_time = timezone.now() + timezone.timedelta(minutes=1)
+
+        for i in range(len(notes_set)):
+            print(notes_set.values()[i]['reminder'])
+            if initial_time < notes_set.values()[i]['reminder'] < end_time:
+                subject = "Note Reminder"
+                message = render_to_string('note_reminder_email.html')
+                sender = os.getenv('EMAIL_HOST_USER')
+                reciever = os.getenv('EMAILID')
+
+                send_mail(subject, message, sender, [reciever])
+        self.response['success'] = True
+        self.response['message'] = "Success"
+        return self.response
+
+    def get_reminders(self,user):
+
+        try:
+            user_id = user.id
+            noteobjects = Note.objects.filter(user_id=user_id)
+
+            remaining_list = []
+            completed_list = []
+            for noteobject in noteobjects:
+
+                if getattr(noteobject, 'reminder') > timezone.now():
+                    remaining_list.append(noteobject.reminder)
+                else:
+                    completed_list.append(noteobject.reminder)
+            reminders = {
+                "remaining": remaining_list,
+                "completed": completed_list
+            }
+            reminder_string = str(reminders)
+
+            response = self.smd_response(True,"Reminder operation successful",reminder_string)
+
+
+        except Note.DoesNotExist:
+            response = self.smd_response(False,"Exception occured while accessing the note",'')
+            return response
+
+
+        return response
+
+    def get_trash(self,user):
+
+        try:
+            user_id = user.id
+            noteobject = Note.objects.filter(user_id=user_id, is_trash=True)
+            notevalues_str = str(noteobject.values())
+        except Note.DoesNotExist:
+            response = self.smd_response(False,"Exception occured while accessing note",'')
+            return response
+        response = self.smd_response(True,"Trash Get operation successful",notevalues_str)
+        return response
+
+    def get_archieved_notes(self,user):
+
+        try:
+            user_id = user.id
+            noteobject = Note.objects.filter(user_id=user_id, is_archieve=True)
+            string_note = str(noteobject.values())
+
+        except Note.DoesNotExist:
+            self.response['message'] = "Exception occured while accessing note"
+            response = self.smd_response(False, "Exception occured while accessing note", '')
+            return response
+
+        response = self.smd_response(False, "Trash Get operation successful", string_note)
+        return response
