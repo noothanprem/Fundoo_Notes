@@ -61,6 +61,8 @@ class Login(GenericAPIView):
     serializer_class = LoginSerializer # setting the serializer class
 
     def post(self, request):
+        request_data = request.data
+        user = request.user
         response = userclassobject.login_user(request)
         final_response = response_class_object.json_response(response)
         if response['success'] == False:

@@ -1,25 +1,25 @@
-import json
-import pdb
-
-from celery.decorators import task
-from celery.utils.log import get_task_logger
-import os
-import redis
-from django.core.mail import send_mail
-from celery.task.schedules import crontab
-from celery.decorators import periodic_task
-from fundoo.setting.development import REMINDER_URL
-from celery import Celery
-from notes.lib.redis_function import RedisOperation
 import requests
-#redisobject=RedisOperation()
+from celery.decorators import periodic_task
+from celery.task.schedules import crontab
+from celery.utils.log import get_task_logger
+
+from fundoo.setting.development import REMINDER_URL
+
+# redisobject=RedisOperation()
 logger = get_task_logger(__name__)
 
 
 @periodic_task(run_every=(crontab(minute='*/1')),
                name="reminder_notification_task",
-               ignore_result = True)
+               ignore_result=True)
 def reminder_notification_task():
+    # ---------------------------------------
+    # allnotes = requests.get(all_note_url)
+    # for note in allnotes.data:
+    #     if note.reminder-time.now() > 2000:
+    #         set rbmq(note email)
+
+    # ---------------------------------------
 
     requests.get(REMINDER_URL)
     # smd_response = {
@@ -46,4 +46,3 @@ def reminder_notification_task():
     # smd_response['success']=True
     # smd_response['message']="success"
     # return smd_response
-
