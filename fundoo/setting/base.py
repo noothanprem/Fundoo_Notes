@@ -56,7 +56,24 @@ INSTALLED_APPS = [
     'bootstrap3',
     'user',
     'notes',
+    'django_cron'
 ]
+
+
+CRONJOBS = [
+    ('*/1 * * * *', 'notes.send.my_scheduled_job','>> ~/cron.log')
+]
+
+
+
+CRON_CLASSES = [
+    "notes.send.MyCronJob",
+]
+
+DJANGO_CRON_LOCKFILE_PATH = "/tmp"
+CRONTAB_COMMAND_SUFFIX = '2>&1'
+ALLOW_PARALLEL_RUNS = True
+DJANGO_CRON_CACHE = 'cron_cache'
 
 
 formatter= logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
@@ -93,6 +110,7 @@ MIDDLEWARE = [
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    'notes.middleware.custommiddleware.MyMiddleware',
 
 
 ]

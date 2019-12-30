@@ -41,7 +41,7 @@ noteobject = NoteOperations()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
-# from .background_tasks import hello
+from .background_tasks import hello
 class UploadImage(GenericAPIView):
     serializer_class = UploadImageSerializer
 
@@ -325,6 +325,20 @@ class ReminderNotification(GenericAPIView):
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
 
+class NewNotification(GenericAPIView):
+    serializer_class = NoteSerializer
+
+    def get(self,request):
+        subject = "Note Reminder"
+        message = render_to_string('note_reminder_email.html')
+        sender = os.getenv('EMAIL_HOST_USER')
+        reciever = os.getenv('EMAILID')
+
+        send_mail(subject, message, sender, [reciever])
+        print("mail send")
+        response={'success':True,'message':"notification",'data':''}
+        return HttpResponse(json.dumps(response))
+
 @method_decorator(login_decorator, name='dispatch')
 class NotesSearch(GenericAPIView):
 
@@ -364,15 +378,15 @@ class NotesSearch(GenericAPIView):
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
 
-# class BackgroundTasks(GenericAPIView):
-#     serializer_class = NoteSerializer
-#
-#
-#     def get(self,request):
-#         hello()
-#         response = response_class_object.smd_response(True, "Successfully fetched notes", '')
-#         final_response = response_class_object.json_response(response)
-#         return HttpResponse(final_response)
+class BackgroundTasks(GenericAPIView):
+    serializer_class = NoteSerializer
+
+
+    def get(self,request):
+        hello()
+        response = response_class_object.smd_response(True, "Successfully fetched notes", '')
+        final_response = response_class_object.json_response(response)
+        return HttpResponse(final_response)
 
 
 
