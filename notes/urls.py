@@ -1,9 +1,7 @@
 from django.urls import path, include
 from django.conf.urls import url
-from . import views
-
 # from .background_tasks import hello
-
+from notes import views
 
 urlpatterns = [
     path('upload_image', views.UploadImage.as_view(), name='upload_view'),
