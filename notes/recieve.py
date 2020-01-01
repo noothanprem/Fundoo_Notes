@@ -15,7 +15,8 @@ from pyee import BaseEventEmitter
 # from fundoo.setting.development import EMAIL_HOST_USER
 
 # ee = BaseEventEmitter()
-from .event_emitter2 import ee
+#from .event_emitter2 import ee
+from .lib.event_emitter import ee
 # @ee.on('send_mail')
 # def send_mail(recipient_email, mail_message):
 #     print("Inside event emitter")

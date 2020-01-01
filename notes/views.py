@@ -5,6 +5,7 @@ import logging
 import os
 import pdb
 
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
@@ -25,7 +26,7 @@ from .lib.amazon_s3_file import UploadImage
 from .lib.redis_function import RedisOperation
 from .models import Note
 from .serializers import UploadImageSerializer, NoteShareSerializer, NoteSerializer, LabelSerializer, \
-    NotesSearchSerializer
+    NotesSearchSerializer, CollaboratorSearializer
 from .service.label import LabelOperations
 from .service.note import NoteOperations
 from utility import Response
@@ -389,6 +390,51 @@ class BackgroundTasks(GenericAPIView):
         response = response_class_object.smd_response(True, "Hello world", '')
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
+
+class AddCollaborator(GenericAPIView):
+    serializer_class = CollaboratorSearializer
+
+    def put(self,request):
+
+        title=request.data['title']
+        collaborators = request.data['collaborator']
+        print("title : ",title)
+        print("collaborator : ",collaborators)
+
+        try:
+            noteobject = Note.objects.get(title=title)
+            str_noteobject = str(noteobject)
+
+
+            collaborator_object = User.objects.filter(email__in=collaborators)
+            print("collaborator object : ",collaborator_object)
+            if not collaborator_object:
+                raise User.DoesNotExist
+            for collab in collaborator_object:
+
+
+            #     # getting the id of the collaborator
+            #     collaborator_id_list = []
+            #     for collab in collaborator_object:
+            #         collaborator_id_list.append(collab.id)
+            #     print(collaborator_id_list, "collaboratoridddddd")
+            #     # adding all the ids to the list
+            #     for collaborator_id in collaborator_id_list:
+            #         collab_list.append(collaborator_id)
+            #
+            # request_data['collab'] = collaborator_list
+        except Note.DoesNotExist:
+            response = response_class_object.smd_response(False,"Exception Occured While Accessing Note",'')
+            json_response = response_class_object.json_response(response)
+            return HttpResponse(json_response)
+        except User.DoesNotExist:
+            response = response_class_object.smd_response(False, "Exception Occured While Accessing User", '')
+            json_response = response_class_object.json_response(response)
+            return HttpResponse(json_response)
+        response = response_class_object.smd_response(True,"Added new collaborator Successfully",str_noteobject)
+        json_resonse = response_class_object.json_response(response)
+        return HttpResponse(json_resonse)
+
 
 
 

@@ -28,3 +28,8 @@ class NotesSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = ['title']
+
+class CollaboratorSearializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ['title','collaborator']
