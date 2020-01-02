@@ -18,7 +18,8 @@ urlpatterns = [
     path('search/<query_data>', views.NotesSearch.as_view(), name='searchview'),
     path('new_notification', views.NewNotification.as_view(), name='new_notification'),
     path('add_collaborator',views.AddCollaborator.as_view(),name='add_collaborator'),
-    path('background_task',views.BackgroundTasks.as_view(),name='background_task_view')
+    path('background_task',views.BackgroundTasks.as_view(),name='background_task_view'),
+    path('AA', views.A.as_view(),name='test')
 ]
 
 # hello(repeat=5,repeat_until=None)

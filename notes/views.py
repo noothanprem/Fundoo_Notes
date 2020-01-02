@@ -42,9 +42,10 @@ noteobject = NoteOperations()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
+
+
 class UploadImage(GenericAPIView):
     serializer_class = UploadImageSerializer
-
 
     def post(self, request):
 
@@ -68,7 +69,6 @@ class UploadImage(GenericAPIView):
 class NoteShare(GenericAPIView):
     serializer_class = NoteShareSerializer
 
-
     def post(self, request):
         """
         :param request: to share the note to social media
@@ -79,9 +79,9 @@ class NoteShare(GenericAPIView):
             note = request.data['note']
         except Exception:
             logger.error("Exception occured")
-            response = response_class_object.smd_response(False,"Exception occured",'')
+            response = response_class_object.smd_response(False, "Exception occured", '')
             final_response = response_class_object.json_response(response)
-            return HttpResponse(final_response,status=404)
+            return HttpResponse(final_response, status=404)
         if title == "" or note == "":
             response = response_class_object.smd_response(False, 'Please fill the fields', '')
             final_response = response_class_object.json_response(response)
@@ -92,6 +92,7 @@ class NoteShare(GenericAPIView):
 @method_decorator(login_decorator, name='dispatch')
 class Trash(GenericAPIView):
     serializer_class = NoteSerializer
+
     def get(self, request):
         """
         :param request: requests for the notes in the trash
@@ -102,17 +103,17 @@ class Trash(GenericAPIView):
         user_id = user.id
         response = noteobject.get_trash(user)
 
-
         final_response = response_class_object.json_response(response)
         if response['success'] == True:
             return HttpResponse(final_response)
         else:
-            return HttpResponse(final_response,status = 400)
+            return HttpResponse(final_response, status=400)
 
 
 @method_decorator(login_decorator, name='dispatch')
 class Archieve(GenericAPIView):
     serializer_class = NoteSerializer
+
     def get(self, request):
         """
         :param request: requests for the archieved note
@@ -124,12 +125,11 @@ class Archieve(GenericAPIView):
         if response['success'] == True:
             return HttpResponse(final_response)
         else:
-            return HttpResponse(final_response,status = 400)
+            return HttpResponse(final_response, status=400)
 
 
 @method_decorator(login_decorator, name='dispatch')
 class Reminder(GenericAPIView):
-
 
     def get(self, request):
         """
@@ -143,13 +143,12 @@ class Reminder(GenericAPIView):
         if response['success'] == True:
             return HttpResponse(final_response)
         else:
-            return HttpResponse(final_response,status=400)
+            return HttpResponse(final_response, status=400)
 
 
 @method_decorator(login_decorator, name='dispatch')
 class CreateLabel(GenericAPIView):
     serializer_class = LabelSerializer
-
 
     def get(self, request):
         """
@@ -160,9 +159,9 @@ class CreateLabel(GenericAPIView):
         response_from_get_label = labelobject.get_label(user)
         final_response = response_class_object.json_response(response_from_get_label)
         if response_from_get_label['success'] == False:
-            return HttpResponse(final_response,status = 404)
+            return HttpResponse(final_response, status=404)
         else:
-            return HttpResponse(final_response,status = 200)
+            return HttpResponse(final_response, status=200)
 
     def post(self, request):
         """
@@ -171,19 +170,17 @@ class CreateLabel(GenericAPIView):
         """
         user = request.user
         data = request.data
-        response_from_create_label = labelobject.create_label(user,data)
+        response_from_create_label = labelobject.create_label(user, data)
         final_response = response_class_object.json_response(response_from_create_label)
         if not response_from_create_label['success']:
-            return HttpResponse(final_response,status = 404)
+            return HttpResponse(final_response, status=404)
         else:
-            return HttpResponse(final_response,status = 200)
-
+            return HttpResponse(final_response, status=200)
 
 
 @method_decorator(login_decorator, name='dispatch')
 class UpdateLabel(GenericAPIView):
     serializer_class = LabelSerializer
-
 
     def put(self, request, label_id):
         """
@@ -193,7 +190,7 @@ class UpdateLabel(GenericAPIView):
         """
         user = request.user
         request_body = request.body
-        response = labelobject.update_label(user,request_body,label_id)
+        response = labelobject.update_label(user, request_body, label_id)
         final_response = response_class_object.json_response(response)
         if response['success'] == False:
             return HttpResponse(final_response, status=400)
@@ -211,14 +208,14 @@ class UpdateLabel(GenericAPIView):
         response = labelobject.delete_label(user, label_id)
         final_response = response_class_object.json_response(response)
         if response['success'] == False:
-            return HttpResponse(final_response,status=404)
+            return HttpResponse(final_response, status=404)
         else:
-            return HttpResponse(final_response,status=200)
+            return HttpResponse(final_response, status=200)
+
 
 @method_decorator(login_decorator, name='dispatch')
 class CreateNote(GenericAPIView):
     serializer_class = NoteSerializer
-
 
     def get(self, request):
         """
@@ -255,10 +252,10 @@ class CreateNote(GenericAPIView):
         else:
             return HttpResponse(final_response, status=200)
 
+
 @method_decorator(login_decorator, name='dispatch')
 class UpdateNote(GenericAPIView):
     serializer_class = NoteSerializer
-
 
     def get(self, request, note_id):
 
@@ -282,9 +279,10 @@ class UpdateNote(GenericAPIView):
         :param note_id: id of the note to update
         :return: updates the note and returns the updated data
         """
-        user =  request.user
+        user = request.user
         request_data = request.data
-        response = noteobject.update_note(user,request_data, note_id)
+        response = noteobject.update_note(user, request_data, note_id)
+        print("response from update note : ", response)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
             return HttpResponse(final_response, status=400)
@@ -314,21 +312,19 @@ class ImageLoading(GenericAPIView):
         return render(request, 'lazy_loading.html')
 
 
-
-
 class ReminderNotification(GenericAPIView):
     serializer_class = NoteSerializer
 
-    def get(self,request):
-
+    def get(self, request):
         response = noteobject.reminder_notification()
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
 
+
 class NewNotification(GenericAPIView):
     serializer_class = NoteSerializer
 
-    def get(self,request):
+    def get(self, request):
         subject = "Note Reminder"
         message = render_to_string('note_reminder_email.html')
         sender = os.getenv('EMAIL_HOST_USER')
@@ -336,22 +332,21 @@ class NewNotification(GenericAPIView):
 
         send_mail(subject, message, sender, [reciever])
         print("mail send")
-        response={'success':True,'message':"notification",'data':''}
+        response = {'success': True, 'message': "notification", 'data': ''}
         return HttpResponse(json.dumps(response))
+
 
 @method_decorator(login_decorator, name='dispatch')
 class NotesSearch(GenericAPIView):
-
     serializer_class = NotesSearchSerializer
 
-    def get(self,request,query_data):
-
+    def get(self, request, query_data):
         client = Elasticsearch()
         search = NotesDocument.search()
 
-        #note_data=search.filter('multi_match', note = note)
-        #note_data=MultiMatch(query=note, fields=['title', 'note','label'])
-        #note_data = Q("multi_match", query=note, fields=['title', 'note'])
+        # note_data=search.filter('multi_match', note = note)
+        # note_data=MultiMatch(query=note, fields=['title', 'note','label'])
+        # note_data = Q("multi_match", query=note, fields=['title', 'note'])
         # note_data = search.query(
         #     {
         #                 "bool": {
@@ -368,73 +363,139 @@ class NotesSearch(GenericAPIView):
         #             }
         # )
 
-
-        query_result = Q("multi_match", query=query_data, fields=['title', 'note','label.name','reminder','color'])
+        query_result = Q("multi_match", query=query_data, fields=['title', 'note', 'label.name', 'reminder', 'color'])
         note_data = search.query(query_result)
-        #pdb.set_trace()
+        # pdb.set_trace()
         new_note_data = NotesSearchSerializer(note_data.to_queryset(), many=True)
-        print("note data : ",new_note_data)
-        response = response_class_object.smd_response(True,"Successfully fetched notes",new_note_data.data)
+        print("note data : ", new_note_data)
+        response = response_class_object.smd_response(True, "Successfully fetched notes", new_note_data.data)
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
+
 
 class BackgroundTasks(GenericAPIView):
     serializer_class = NoteSerializer
 
-    def get(self,request):
+    def get(self, request):
         # hello()
         # response = response_class_object.smd_response(True, "Successfully fetched notes", '')
         # final_response = response_class_object.json_response(response)
         # return HttpResponse(final_response
+
         hello(repeat=5)
         response = response_class_object.smd_response(True, "Hello world", '')
         final_response = response_class_object.json_response(response)
         return HttpResponse(final_response)
 
+
 class AddCollaborator(GenericAPIView):
     serializer_class = CollaboratorSearializer
 
-    def put(self,request):
+    def put(self, request):
+        # =================================================
+        print("Helllo")
+        all_user = User.objects.all()
+        print(all_user)
 
-        title=request.data['title']
+        all_email = [user.email for user in all_user]
+
+        print(all_email)
+        note_info = Note.objects.get(title=request.data['title'])
+        print(note_info)
+        col_info = note_info.collaborator
+        print(col_info)
+        col = col_info.values()[0]['email']
+        print(col)
+        my_given_coll = request.data['collaborator']
+        print(my_given_coll)
+
+        # =================================================
+        title = request.data['title']
         collaborators = request.data['collaborator']
-        print("title : ",title)
-        print("collaborator : ",collaborators)
+        print("title : ", title)
+        print("collaborator : ", collaborators)
 
         try:
-            noteobject = Note.objects.get(title=title)
-            str_noteobject = str(noteobject)
 
+            all_user = User.objects.all()
+            print("all user : ", all_user)
+            all_email = [user.email for user in all_user]
+            print("all email : ", all_email)
+            note_info = Note.objects.get(title=request.data['title'])
+            # note_info = Note.objects.filter(title=request.data['title']).values()
+            print("note info : ", note_info)
+            # pdb.set_trace()
+            col_info = note_info.collaborator
+            # col_info = note_info[0]['collaborator']
+            print("col_info : ", col_info)
+            if col_info is not None:
+                col = col_info.values()[0]['email']
+                print("collaborator email : ", col)
+                print("collaborator email type : ", type(col))
+                given_coll = request.data['collaborator']
+                print(given_coll)
+                if col not in given_coll:
+                    for each_collaborator in given_coll:
+                        given_collaborator = each_collaborator
+                    print("Given collaborator : ", given_collaborator)
+                    # user_info = User.objects.filter(email=given_collaborator).values()
 
-            collaborator_object = User.objects.filter(email__in=collaborators)
-            print("collaborator object : ",collaborator_object)
-            if not collaborator_object:
-                raise User.DoesNotExist
-            for collab in collaborator_object:
+                    print("Note values : ", note_info.collaborator.values())
+                    # new_coll_value = note_info.collaborator.values()[0]['email']
+                    print("new collaborator value : ", note_info.collaborator.values()[0]['email'])
+                # noteobject = Note.objects.get(title=title)
+                # str_noteobject = str(noteobject)
+                # print("str note object : ",str_noteobject)
+                #
+                # collaborator_object = User.objects.filter(email__in=collaborators)
+                # print("collaborator object : ", collaborator_object)
+                # collaborator_id_list = []
+                # for each_collaborator in collaborator_object:
+                #     collaborator_id_list.append(each_collaborator.id)
+                # print("collaborator_id_list : ",collaborator_id_list)
+                # if not collaborator_object:
+                #     raise User.DoesNotExist
 
+                # for collab in collaborator_object:
+                # print("note collaborator : ",note_collab)
 
-            #     # getting the id of the collaborator
-            #     collaborator_id_list = []
-            #     for collab in collaborator_object:
-            #         collaborator_id_list.append(collab.id)
-            #     print(collaborator_id_list, "collaboratoridddddd")
-            #     # adding all the ids to the list
-            #     for collaborator_id in collaborator_id_list:
-            #         collab_list.append(collaborator_id)
-            #
-            # request_data['collab'] = collaborator_list
+                # note_query_set = Note.objects.filter(title=title,collaborator__in=collaborator_id_list)
+                # print("new note object : ",note_query_set)
+                # if noteobject in note_query_set:
+                #     print("collaborator already exists")
+
         except Note.DoesNotExist:
-            response = response_class_object.smd_response(False,"Exception Occured While Accessing Note",'')
+            response = response_class_object.smd_response(False, "Exception Occured While Accessing Note", '')
             json_response = response_class_object.json_response(response)
             return HttpResponse(json_response)
         except User.DoesNotExist:
             response = response_class_object.smd_response(False, "Exception Occured While Accessing User", '')
             json_response = response_class_object.json_response(response)
             return HttpResponse(json_response)
-        response = response_class_object.smd_response(True,"Added new collaborator Successfully",str_noteobject)
+        response = response_class_object.smd_response(True, "Added new collaborator Successfully", '')
         json_resonse = response_class_object.json_response(response)
         return HttpResponse(json_resonse)
 
 
+class A(GenericAPIView):
+    serializer_class = NoteSerializer
 
+    def put(self, request):
 
+        user = request.user
+        request_data = request.data
+        note_info = Note.objects.get(title=request.data['title'])
+        print('====================================')
+
+        print('=+++++++++++++++++++++++++===')
+        print('---------------------------------')
+        response = noteobject.update_coll(user.id, request_data, note_info)
+
+        print("response from update note : ", response)
+        final_response = response_class_object.json_response(response)
+        if not response['success']:
+            return HttpResponse(final_response, status=400)
+        else:
+            return HttpResponse(final_response)
+
+#

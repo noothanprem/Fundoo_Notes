@@ -17,19 +17,23 @@ class NoteShareSerializer(serializers.ModelSerializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title', 'note', 'label', 'collaborator', 'image', 'is_archieve', 'is_trash', 'reminder', 'is_pin', 'url']
+        fields = ['title', 'note', 'label', 'collaborator', 'image', 'is_archieve', 'is_trash', 'reminder', 'is_pin',
+                  'url']
 
 
 class LabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
         fields = ['id', 'name']
+
+
 class NotesSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = ['title']
 
+
 class CollaboratorSearializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title','collaborator']
+        fields = ['title', 'collaborator']
