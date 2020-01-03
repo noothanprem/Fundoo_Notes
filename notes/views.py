@@ -391,93 +391,93 @@ class BackgroundTasks(GenericAPIView):
 class AddCollaborator(GenericAPIView):
     serializer_class = CollaboratorSearializer
 
-    def put(self, request):
-        # =================================================
-        print("Helllo")
-        all_user = User.objects.all()
-        print(all_user)
+    # def put(self, request):
+    #     # =================================================
+    #     print("Helllo")
+    #     all_user = User.objects.all()
+    #     print(all_user)
+    #
+    #     all_email = [user.email for user in all_user]
+    #
+    #     print(all_email)
+    #     note_info = Note.objects.get(title=request.data['title'])
+    #     print(note_info)
+    #     col_info = note_info.collaborator
+    #     print(col_info)
+    #     col = col_info.values()[0]['email']
+    #     print(col)
+    #     my_given_coll = request.data['collaborator']
+    #     print(my_given_coll)
+    #
+    #     # =================================================
+    #     title = request.data['title']
+    #     collaborators = request.data['collaborator']
+    #     print("title : ", title)
+    #     print("collaborator : ", collaborators)
+    #
+    #     try:
+    #
+    #         all_user = User.objects.all()
+    #         print("all user : ", all_user)
+    #         all_email = [user.email for user in all_user]
+    #         print("all email : ", all_email)
+    #         note_info = Note.objects.get(title=request.data['title'])
+    #         # note_info = Note.objects.filter(title=request.data['title']).values()
+    #         print("note info : ", note_info)
+    #         # pdb.set_trace()
+    #         col_info = note_info.collaborator
+    #         # col_info = note_info[0]['collaborator']
+    #         print("col_info : ", col_info)
+    #         if col_info is not None:
+    #             col = col_info.values()[0]['email']
+    #             print("collaborator email : ", col)
+    #             print("collaborator email type : ", type(col))
+    #             given_coll = request.data['collaborator']
+    #             print(given_coll)
+    #             if col not in given_coll:
+    #                 for each_collaborator in given_coll:
+    #                     given_collaborator = each_collaborator
+    #                 print("Given collaborator : ", given_collaborator)
+    #                 # user_info = User.objects.filter(email=given_collaborator).values()
+    #
+    #                 print("Note values : ", note_info.collaborator.values())
+    #                 # new_coll_value = note_info.collaborator.values()[0]['email']
+    #                 print("new collaborator value : ", note_info.collaborator.values()[0]['email'])
+    #             # noteobject = Note.objects.get(title=title)
+    #             # str_noteobject = str(noteobject)
+    #             # print("str note object : ",str_noteobject)
+    #             #
+    #             # collaborator_object = User.objects.filter(email__in=collaborators)
+    #             # print("collaborator object : ", collaborator_object)
+    #             # collaborator_id_list = []
+    #             # for each_collaborator in collaborator_object:
+    #             #     collaborator_id_list.append(each_collaborator.id)
+    #             # print("collaborator_id_list : ",collaborator_id_list)
+    #             # if not collaborator_object:
+    #             #     raise User.DoesNotExist
+    #
+    #             # for collab in collaborator_object:
+    #             # print("note collaborator : ",note_collab)
+    #
+    #             # note_query_set = Note.objects.filter(title=title,collaborator__in=collaborator_id_list)
+    #             # print("new note object : ",note_query_set)
+    #             # if noteobject in note_query_set:
+    #             #     print("collaborator already exists")
+    #
+    #     except Note.DoesNotExist:
+    #         response = response_class_object.smd_response(False, "Exception Occured While Accessing Note", '')
+    #         json_response = response_class_object.json_response(response)
+    #         return HttpResponse(json_response)
+    #     except User.DoesNotExist:
+    #         response = response_class_object.smd_response(False, "Exception Occured While Accessing User", '')
+    #         json_response = response_class_object.json_response(response)
+    #         return HttpResponse(json_response)
+    #     response = response_class_object.smd_response(True, "Added new collaborator Successfully", '')
+    #     json_resonse = response_class_object.json_response(response)
+    #     return HttpResponse(json_resonse)
 
-        all_email = [user.email for user in all_user]
 
-        print(all_email)
-        note_info = Note.objects.get(title=request.data['title'])
-        print(note_info)
-        col_info = note_info.collaborator
-        print(col_info)
-        col = col_info.values()[0]['email']
-        print(col)
-        my_given_coll = request.data['collaborator']
-        print(my_given_coll)
-
-        # =================================================
-        title = request.data['title']
-        collaborators = request.data['collaborator']
-        print("title : ", title)
-        print("collaborator : ", collaborators)
-
-        try:
-
-            all_user = User.objects.all()
-            print("all user : ", all_user)
-            all_email = [user.email for user in all_user]
-            print("all email : ", all_email)
-            note_info = Note.objects.get(title=request.data['title'])
-            # note_info = Note.objects.filter(title=request.data['title']).values()
-            print("note info : ", note_info)
-            # pdb.set_trace()
-            col_info = note_info.collaborator
-            # col_info = note_info[0]['collaborator']
-            print("col_info : ", col_info)
-            if col_info is not None:
-                col = col_info.values()[0]['email']
-                print("collaborator email : ", col)
-                print("collaborator email type : ", type(col))
-                given_coll = request.data['collaborator']
-                print(given_coll)
-                if col not in given_coll:
-                    for each_collaborator in given_coll:
-                        given_collaborator = each_collaborator
-                    print("Given collaborator : ", given_collaborator)
-                    # user_info = User.objects.filter(email=given_collaborator).values()
-
-                    print("Note values : ", note_info.collaborator.values())
-                    # new_coll_value = note_info.collaborator.values()[0]['email']
-                    print("new collaborator value : ", note_info.collaborator.values()[0]['email'])
-                # noteobject = Note.objects.get(title=title)
-                # str_noteobject = str(noteobject)
-                # print("str note object : ",str_noteobject)
-                #
-                # collaborator_object = User.objects.filter(email__in=collaborators)
-                # print("collaborator object : ", collaborator_object)
-                # collaborator_id_list = []
-                # for each_collaborator in collaborator_object:
-                #     collaborator_id_list.append(each_collaborator.id)
-                # print("collaborator_id_list : ",collaborator_id_list)
-                # if not collaborator_object:
-                #     raise User.DoesNotExist
-
-                # for collab in collaborator_object:
-                # print("note collaborator : ",note_collab)
-
-                # note_query_set = Note.objects.filter(title=title,collaborator__in=collaborator_id_list)
-                # print("new note object : ",note_query_set)
-                # if noteobject in note_query_set:
-                #     print("collaborator already exists")
-
-        except Note.DoesNotExist:
-            response = response_class_object.smd_response(False, "Exception Occured While Accessing Note", '')
-            json_response = response_class_object.json_response(response)
-            return HttpResponse(json_response)
-        except User.DoesNotExist:
-            response = response_class_object.smd_response(False, "Exception Occured While Accessing User", '')
-            json_response = response_class_object.json_response(response)
-            return HttpResponse(json_response)
-        response = response_class_object.smd_response(True, "Added new collaborator Successfully", '')
-        json_resonse = response_class_object.json_response(response)
-        return HttpResponse(json_resonse)
-
-
-class A(GenericAPIView):
+class AddCollaborator(GenericAPIView):
     serializer_class = NoteSerializer
 
     def put(self, request):
@@ -485,10 +485,6 @@ class A(GenericAPIView):
         user = request.user
         request_data = request.data
         note_info = Note.objects.get(title=request.data['title'])
-        print('====================================')
-
-        print('=+++++++++++++++++++++++++===')
-        print('---------------------------------')
         response = noteobject.update_coll(user.id, request_data, note_info)
 
         print("response from update note : ", response)

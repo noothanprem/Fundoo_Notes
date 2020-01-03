@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 import json
 import logging
+from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -386,50 +387,58 @@ class NoteOperations:
         # pdb.set_trace()
 
         try:
-            try:
 
-                # getting the given collaborators
-                collaborators = request_data['collaborator']
-                print(collaborators, "collaborators")
-                collaborator_object = User.objects.filter(email__in=collaborators)
-                collaborator_id_list=[]
-                new_collaborator_id_list = []
-                each_new_collaborator = ''
-                old_collaborator_list = note_object.collaborator
-                old_collaborator_id_list = []
-                print("Old collaborator list : ",old_collaborator_list)
-                each_old_collaborator = ''
-                for each_old_collaborator in old_collaborator_list:
-                    old_collaborator_id_list.append(each_old_collaborator.id)
-                for each_new_collaborator in collaborator_object:
-                    new_collaborator_id_list.append(each_new_collaborator.id)
-                total_list_length = len(old_collaborator_id_list)+len(new_collaborator_id_list)
-                final_collaborator_list = old_collaborator_id_list.extend(new_collaborator_id_list)
-                print("final collaborator list : ",final_collaborator_list)
-                request_data['collaborator'] = final_collaborator_list
-                print("request_data : ", request_data)
-            except User.DoesNotExit:
-                self.response['message'] = "Exception occured while accessing the user"
-                return self.response
-            except KeyError:
-                self.response['message'] = "KeyError occured"
-                return self.response
+            # getting the given collaborators
+            collaborators = request_data['collaborator']
+            print(collaborators, "collaborators")
+            collaborator_object = User.objects.filter(email__in=collaborators)
+            collaborator_id_list=[]
+            new_collaborator_id_list = []
+            each_new_collaborator = ''
+            print("note object : ",note_object)
+            new_collaborator_object = note_object.collaborator
+            coll_list = list(new_collaborator_object.values_list())
+            print("collaborator values list : ",coll_list)
+            coll_list_length = len(coll_list)
+            print("collaborator values list length : ",coll_list_length)
+            old_collaborator_list = []
+            for i in range(coll_list_length):
+                old_collaborator = note_object.collaborator.values()[i]['email']
+                old_collaborator_list.append(old_collaborator)
+            print("Old collaborator list : ",old_collaborator_list)
+            old_collaborator_id_list = []
 
-            # makes 'partial' as 'True' because we are not using all the fileds of the Note
-            serializer = NoteSerializer(note_object, data=request_data, partial=True)
-            print("serailizer : ", serializer)
-            print("valid serializer : ", serializer.is_valid())
-            if serializer.is_valid():
-                print("valid serializer")
-                update_note = serializer.save()
-                string_user_id = str(user_id)
-                redisobject.hmset(string_user_id + "note", {update_note.id: str(json.dumps(serializer.data))})
-                logger.info("Update Operation Successful")
-                self.response['success'] = True
-                self.response['message'] = "Update Operation Successful"
-                self.response['data'].append(request_data)
-                return self.response
-        except Exception as e:
-            print("Exception : ", e)
-            self.response['message'] = "Update operation failed"
+            each_old_collaborator = ''
+            for each_old_collaborator in old_collaborator_list:
+                user_object = User.objects.get(email=each_old_collaborator)
+                collaborator_id = user_object.id
+                old_collaborator_id_list.append(collaborator_id)
+            print("old collaborator id  list : ",old_collaborator_id_list)
+            for each_new_collaborator in collaborator_object:
+                new_collaborator_id_list.append(each_new_collaborator.id)
+            print("new collaborator id list : ",new_collaborator_id_list)
+            total_list_length = len(old_collaborator_id_list)+len(new_collaborator_id_list)
+            final_collaborator_list = old_collaborator_id_list+new_collaborator_id_list
+            final_collaborator_list_without_duplicates = list(dict.fromkeys(final_collaborator_list))
+            print("final collaborator list : ",final_collaborator_list)
+            print("final collaborator list without duplicates : ",final_collaborator_list_without_duplicates)
+            request_data['collaborator'] = final_collaborator_list_without_duplicates
+            print("request_data : ", request_data)
+        except User.DoesNotExist:
+            self.response['message'] = "Exception occured while accessing the user"
+            return self.response
+        except KeyError:
+            self.response['message'] = "KeyError occured"
+            return self.response
+
+        # makes 'partial' as 'True' because we are not using all the fileds of the Note
+        serializer = NoteSerializer(note_object, data=request_data, partial=True)
+        if serializer.is_valid():
+            update_note = serializer.save()
+            string_user_id = str(user_id)
+            redisobject.hmset(string_user_id + "note", {update_note.id: str(json.dumps(serializer.data))})
+            logger.info("Update Operation Successful")
+            self.response['success'] = True
+            self.response['message'] = "Update Operation Successful"
+            self.response['data'].append(request_data)
             return self.response
