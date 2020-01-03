@@ -52,19 +52,30 @@ class NoteOperations:
             data = request.data  # getting the user
             user = request.user
             user_id = user.id
-            # creating the lists for collaborators and labels
 
-            label_list = []
-            labels = data['label']  # iterates through all the labels in the list
-            for label in labels:  # getting each label and adding the label_id to the list
-                labelobject = Label.objects.filter(user_id=user_id, name=label)
-                if not labelobject:
-                    raise Label.DoesNotExist
-                label_id = labelobject.values()[0]['id']
-                label_list.append(label_id)
-                print("label list  : ", label_list)
+            labels = data['label']
+#
+
+            label_objects_list = [Label.objects.filter(user_id=user_id, name=label) for label in labels]
+            label_id_list = [each_object.values()[0]['id'] for each_object in label_objects_list]
+
+#
+
+            # label_list = []
+            # labels = data['label']
+            #
+            # for label in labels:
+            #     labelobject = Label.objects.filter(user_id=user_id, name=label)
+            #     if not labelobject:
+            #         raise Label.DoesNotExist
+            #     # label_id = labelobject.values()[0]['id']
+            #     label_list.append(labelobject.values()[0]['id'])
+            #
+            #     print("label list  : ", label_list)
             # replaces the 'label' in data with the new label_list
-            data['label'] = label_list
+
+            data['label'] = label_id_list
+            print("label data : ",data['label'])
         except Label.DoesNotExist:
             logger.error("Exception occured while accessing label")
             response = self.smd_response(False, "Exception occured while accessing label", [])
@@ -79,12 +90,10 @@ class NoteOperations:
             # getting the collaborators with the given email
             collaborator_object = User.objects.filter(email__in=collaborators)
 
-            if not collaborator_object:
-                raise User.DoesNotExist
             # getting the id of the collaborator
             collaborator_id_list = [collab.id for collab in collaborator_object]
             # adding all the ids to the list
-            collab_list = [collaborator_id for collaborator_id in collaborator_id_listl]
+            collab_list = [collaborator_id for collaborator_id in collaborator_id_list]
 
             # replaces in the data with the new list
             data['collaborator'] = collab_list
@@ -101,7 +110,6 @@ class NoteOperations:
 
         serializer = NoteSerializer(data=data, partial=True)
         if serializer.is_valid():
-            print("Serializer valid ")
             create_note = serializer.save(user=user)
 
             string_user_id = str(user.id)
@@ -193,18 +201,22 @@ class NoteOperations:
 
                 # Iterates through the labels
 
-                for label in labels:
+                label_object_list = [Label.objects.filter(user=user_id, name=label) for label in labels]
+                label_id_list = [label_object.values()[0]['id'] for label_object in label_object_list]
 
-                    # getting the label with the given id and name
-                    label_object = Label.objects.filter(user=user_id, name=label)
-                    if not label_object:
-                        raise Label.DoesNotExist
-                    # getting the value of 'id'
-                    label_id = label_object.values()[0]['id']
-                    # adding each labels id to a list
-                    label_list.append(label_id)
-                # replacing the label data with id's list
-                request_data['label'] = label_list
+                # for label in labels:
+                #
+                #     # getting the label with the given id and name
+                #     label_object = Label.objects.filter(user=user_id, name=label)
+                #     if not label_object:
+                #         raise Label.DoesNotExist
+                #     # getting the value of 'id'
+                #     label_id = label_object.values()[0]['id']
+                #     # adding each labels id to a list
+                #     label_list.append(label_id)
+                # # replacing the label data with id's list
+
+                request_data['label'] = label_id_list
             except Label.DoesNotExist:
                 logger.error("Exception occured while accessing Label")
 
