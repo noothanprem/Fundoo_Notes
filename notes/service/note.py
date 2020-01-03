@@ -40,7 +40,7 @@ class NoteOperations:
     Function for creating note
     """
 
-    def create_note(self, request):
+    def create(self, request):
         """
         :param request: passes the note datas
         :return: creates note
@@ -53,7 +53,7 @@ class NoteOperations:
             user = request.user
             user_id = user.id
             # creating the lists for collaborators and labels
-            collab_list = []
+
             label_list = []
             labels = data['label']  # iterates through all the labels in the list
             for label in labels:  # getting each label and adding the label_id to the list
@@ -82,18 +82,12 @@ class NoteOperations:
             if not collaborator_object:
                 raise User.DoesNotExist
             # getting the id of the collaborator
-            collaborator_id_list = []
-            for collab in collaborator_object:
-                collaborator_id_list.append(collab.id)
-                print("collaborator id list : ", collaborator_id_list)
+            collaborator_id_list = [collab.id for collab in collaborator_object]
             # adding all the ids to the list
-            for collaborator_id in collaborator_id_list:
-                collab_list.append(collaborator_id)
-                print("collaborator list : ", collab_list)
+            collab_list = [collaborator_id for collaborator_id in collaborator_id_listl]
 
             # replaces in the data with the new list
             data['collaborator'] = collab_list
-            print("data : ", data)
 
         except User.DoesNotExist:
 
@@ -123,7 +117,7 @@ class NoteOperations:
         response = self.smd_response(False, "Note creation failed", [])
         return response
 
-    def get_note(self, user, note_id):
+    def get(self, user, note_id):
         """
         :param request: to get the note
         :param note_id: id of the note
@@ -164,14 +158,14 @@ class NoteOperations:
         self.response['data'].append(str_note_data)
         return self.response
 
-    def update_note(self, user, request_data, note_id):
+    def update(self, user, request_data, note_id):
         """
         :param request: to update a note
         :param note_id: id of the note
         :return: updates the note with the new data
         """
 
-        pdb.set_trace()
+
 
         try:
             try:
@@ -191,7 +185,6 @@ class NoteOperations:
                 return self.response
 
             label_list = []
-            collaborator_list = []
             try:
 
                 # getting the labels from the request data
@@ -228,7 +221,7 @@ class NoteOperations:
 
                 # getting the given collaborators
                 collaborators = request_data['collaborator']
-                print(collaborators, "collaborators")
+
                 # Iterates through the collaborators
                 for collaborator in collaborators:
                     # getting the collaborator with the given email
@@ -236,16 +229,10 @@ class NoteOperations:
                     if not collaborator_object:
                         raise User.DoesNotExist
                     # getting the id of the collaborator
-                    collaborator_id_list = []
-                    for collab in collaborator_object:
-                        collaborator_id_list.append(collab.id)
-                    print(collaborator_id_list, "collaboratoridddddd")
+                    collaborator_id_list = [collab.id for collab in collaborator_object]
                     # adding all the ids to the list
-                    for collaborator_id in collaborator_id_list:
-                        collaborator_list.append(collaborator_id)
-                print("collab list : ", collaborator_list)
+                    collaborator_list = [collaborator_id for collaborator_id in collaborator_id_list]
                 request_data['collaborator'] = collaborator_list
-                print("request_data : ", request_data)
             except User.DoesNotExit:
                 self.response['message'] = "Exception occured while accessing the user"
                 return self.response
@@ -274,7 +261,7 @@ class NoteOperations:
 
     # Function to delete the note
 
-    def delete_note(self, user, note_id):
+    def delete(self, user, note_id):
         """
         :param request: for deleting note
         :param note_id: id of the note
@@ -383,11 +370,12 @@ class NoteOperations:
         response = self.smd_response(False, "Trash Get operation successful", string_note)
         return response
 
-    def update_coll(self, user_id, request_data, note_object):
+    def update_coll(self, user_id, request_data):
         # pdb.set_trace()
 
         try:
 
+            note_object = Note.objects.get(title=request.data['title'])
             # getting the given collaborators
             collaborators = request_data['collaborator']
             print(collaborators, "collaborators")
@@ -402,20 +390,27 @@ class NoteOperations:
             coll_list_length = len(coll_list)
             print("collaborator values list length : ",coll_list_length)
             old_collaborator_list = []
-            for i in range(coll_list_length):
-                old_collaborator = note_object.collaborator.values()[i]['email']
-                old_collaborator_list.append(old_collaborator)
+
+            old_collaborator_list = [note_object.collaborator.values()[i]['email'] for i in range(coll_list_length)]
+
+            # for i in range(coll_list_length):
+            #     old_collaborator = note_object.collaborator.values()[i]['email']
+            #     old_collaborator_list.append(old_collaborator)
             print("Old collaborator list : ",old_collaborator_list)
             old_collaborator_id_list = []
 
             each_old_collaborator = ''
+
             for each_old_collaborator in old_collaborator_list:
                 user_object = User.objects.get(email=each_old_collaborator)
                 collaborator_id = user_object.id
                 old_collaborator_id_list.append(collaborator_id)
             print("old collaborator id  list : ",old_collaborator_id_list)
-            for each_new_collaborator in collaborator_object:
-                new_collaborator_id_list.append(each_new_collaborator.id)
+
+            new_collaborator_id_list = [each_new_collaborator.id for each_new_collaborator in collaborator_object]
+
+            # for each_new_collaborator in collaborator_object:
+            #     new_collaborator_id_list.append(each_new_collaborator.id)
             print("new collaborator id list : ",new_collaborator_id_list)
             total_list_length = len(old_collaborator_id_list)+len(new_collaborator_id_list)
             final_collaborator_list = old_collaborator_id_list+new_collaborator_id_list

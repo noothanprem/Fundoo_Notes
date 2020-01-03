@@ -244,7 +244,7 @@ class CreateNote(GenericAPIView):
         :param request: requests to create a note with the given data
         :return: returns the new note data
         """
-        response = noteobject.create_note(request)
+        response = noteobject.create(request)
         final_response = response_class_object.json_response(response)
         if response['success'] == False:
 
@@ -265,7 +265,7 @@ class UpdateNote(GenericAPIView):
         :return: returns the requested note datas
         """
         user = request.user
-        response = noteobject.get_note(user, note_id)
+        response = noteobject.get(user, note_id)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
             return HttpResponse(final_response, status=400)
@@ -281,7 +281,7 @@ class UpdateNote(GenericAPIView):
         """
         user = request.user
         request_data = request.data
-        response = noteobject.update_note(user, request_data, note_id)
+        response = noteobject.update(user, request_data, note_id)
         print("response from update note : ", response)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
@@ -297,7 +297,7 @@ class UpdateNote(GenericAPIView):
         :return: deletes the note
         """
         user = request.user
-        response = noteobject.delete_note(user, note_id)
+        response = noteobject.delete(user, note_id)
         final_response = response_class_object.json_response(response)
         if (response['success'] == False):
 
@@ -485,7 +485,7 @@ class AddCollaborator(GenericAPIView):
         user = request.user
         request_data = request.data
         note_info = Note.objects.get(title=request.data['title'])
-        response = noteobject.update_coll(user.id, request_data, note_info)
+        response = noteobject.update_coll(user.id, request_data)
 
         print("response from update note : ", response)
         final_response = response_class_object.json_response(response)
