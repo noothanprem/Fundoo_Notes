@@ -30,7 +30,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 coverage==4.5.4
 crontab==0.22.6
-cryptography==2.7
+cryptography==3.2
 cssutils==1.0.2
 daphne==2.3.0
 datadispatch==1.0.0
