@@ -103,7 +103,7 @@ lazr.uri==1.0.3
 lazy-object-proxy==1.4.2
 locustio==0.12.1
 macaroonbakery==1.1.4
-Mako==1.0.7
+Mako==1.2.2
 MarkupSafe==1.1.1
 mccabe==0.6.1
 mixer==6.1.3
